@@ -1,0 +1,143 @@
+START_WITH recursividadBasica();
+
+double mcd(double a, double b){
+    if (b == 0.0) {
+        return a;
+    } else {
+        return mcd(b, a % b);
+    }
+}
+
+double factorial(double n) {
+    if (n <= 1.0) {
+        return 1.0;
+    } else {
+        return n * factorial(n - 1.0);
+    }
+}
+
+double fibonacci(double n) {
+    if (n <= 1.0) {
+        return n;
+    } else {
+        return fibonacci(n - 1.0) + fibonacci(n - 2.0);
+    }
+}
+
+double sumaNaturales(double n) {
+    if (n <= 1.0) {
+        return n;
+    } else {
+        return n + sumaNaturales(n - 1.0);
+    }
+}
+
+int miFuncion(int n) {
+    if (n >= 1) {
+        println("N es " + n);
+        return miFuncion(n - 1);
+    }
+    println("Booom");
+    return 0;
+}
+
+// Función recursiva que usa un ciclo
+double sumaConCiclo(double n, double m) {
+    var  suma: double = 0.0;
+    var i :double;
+    for (i=0.0; i < m; i++) {
+        suma = suma + i;
+    }
+    if (n <= 1.0) {
+        return suma;
+    } else {
+        return suma + sumaConCiclo(n - 1.0, m);
+    }
+}
+
+void Hanoi(int discos, int origen, int auxiliar, int destino) {
+    if (discos == 1) {
+        println("Mover disco de " + origen + " a " + destino);
+    } else {
+        Hanoi(discos - 1, origen, destino, auxiliar);
+        println("Mover disco de " + origen + " a " + destino);
+        Hanoi(discos - 1, auxiliar, origen, destino);
+    }
+}
+
+void ParoImpar(int a) {
+    if ((par(a)) == 1) { // El número es Par
+        println("El numero '" + a + "' es Par");
+    } else { // El número es impar
+        println("El numero '" + a + "' es Impar");
+    }
+}
+
+int par(int nump){
+    if (nump == 0) {
+        return 1;
+    }
+    return impar(nump - 1);
+}
+
+int impar(int numi){
+    if (numi == 0) {
+        return 0;
+    }
+    return par(numi - 1);
+}
+
+int ackermanPuntosMenos(int m, int n){
+    if (m == 0) {
+        return n + 1;
+    } else if ((m > 0) && (n == 0)) {
+        return ackermanPuntosMenos(m - 1, 1);
+    } else {
+        return ackermanPuntosMenos(m - 1, ackermanPuntosMenos(m, n - 1));
+    }
+}
+
+void recursividadBasica(){
+    const resultadoMCD: double = mcd(48.0, 18.0);
+    if (resultadoMCD == 6.0) {
+        println("Funcion MCD correcta");
+    } else {
+        println("Funcion MCD incorrecta");
+    }
+
+    const resultadoFactorial: double = factorial(5.0);
+    if (resultadoFactorial == 120.0) {
+        println("Funcion factorial correcta");
+    } else {
+        println("Funcion factorial incorrecta");
+    }
+
+    const resultadoFibonacci: double = fibonacci(10.0);
+    if (resultadoFibonacci == 55.0) {
+        println("Funcion fibonacci correcta");
+    } else {
+        println("Funcion fibonacci incorrecta");
+    }
+
+    const resultadoSumaNaturales: double = sumaNaturales(10.0);
+    if (resultadoSumaNaturales == 55.0) {
+        println("Funcion suma de naturales correcta");
+    } else {
+        println("Funcion suma de naturales incorrecta");
+    }
+
+    miFuncion(15);
+
+    var m : int = 3;
+    var n: int = 4; 
+    println("AckerMan");
+    println("Funcion de Ackerman Puntos Menos ( " + m + ", " + n + ") = " + ackermanPuntosMenos(m, n));
+
+   
+
+    println("Prueba de la funcion Hanoi con 3 discos:");
+    Hanoi(3, 1, 2, 3);
+
+    println("Prueba de la funcion ParoImpar con numero 3:");
+    ParoImpar(3);
+}

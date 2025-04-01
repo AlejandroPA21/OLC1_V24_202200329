@@ -1,0 +1,29 @@
+start_with execute();
+void execute(){
+var vector1: string[]= ["Hola", "Mundo"];
+println(vector1);
+var vector2: int[][] = [[1, 2], [3, 4]];
+vector1[0]="Compi";
+vector1[1]="Uno";
+println(vector1);
+println(vector2);
+vector2[1][0]=6;
+println(vector2);
+List <string> miLista = new List();
+miLista.append("Organ");
+miLista.append("Compiladores");
+miLista.append("Uno");
+var h : bool = miLista.find("Compiladores");
+println(h);
+println(miLista);
+var hola : int = milista.remove(2);
+println(hola);
+println(miLista);
+miLista[1]=16;
+var ola : int = miLista[1];
+println(miLista);
+var v4 : int [] = [1,2,3,4];
+var v5 : int [] = [5,4,3,2,1];
+var v6: int [][] = [v4,v5];
+println(v6[0][3]);
+}

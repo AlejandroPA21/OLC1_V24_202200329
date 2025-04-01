@@ -1,0 +1,43 @@
+START_WITH strcts_function();
+struct{
+nombre:string;
+edad:int;
+}estudiante;
+
+
+
+struct{
+papa:string;
+edad:int;
+hermano : estudiante;
+}estudiante2;
+
+void strcts_function(){
+  
+var e1:estudiante = { nombre: "prueba", edad: 10 };
+const e2: estudiante = { nombre: "prueba2", edad: 20};
+const edadEstudiante:int = e2.edad; // debe ser 10
+const nombreEstudiante:String = e2.nombre; 
+println("Nombre del estudiante: "+ nombreEstudiante + " Edad estudiante: "+ edadEstudiante);
+
+
+
+var e3: estudiante2 = {  hermano: var e4:estudiante = { nombre: "jjjjj", edad: 20 }; , papa: "jajajajaj", edad: 20 };
+println(e3);
+var e5: estudiante2 = {  hermano: { nombre: "Javo", edad: 12 } , papa: "Adler", edad: 21 };
+println(e5);
+var e6: estudiante2 =  {  hermano: e1 , papa: "Joram", edad: 22 };
+println(e6);
+
+
+
+
+e3.hermano.nombre = "Jose Antonio";
+e3.hermano.edad = 50;
+println(e3);
+var nombreX : String = e3.hermano.nombre;
+var edadX: int = e3.hermano.edad;
+println(nombreX + (edadX+5));
+
+}
+

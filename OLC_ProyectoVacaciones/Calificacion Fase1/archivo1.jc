@@ -1,0 +1,50 @@
+//declaramos las variables que vamos a usar
+var aritmetica1: double;
+var aritmetica2: DoUbLe;
+
+var relacional3: bool;
+var relacional4: bool;
+
+var logica1: bool;
+var logica3: bool;
+
+var total: DoUbLe;
+
+//validamos las operaciones aritmeticas 
+aritmetica1 = -1 + 20 - 30 % 10 + 5 * 52 / 26 + 2 ** 5; //esto debe ser 61
+aritmetica2 = 2 + 5 - 9 * 8 + 3 / 2 + 6 - 4 * 5 / 5 + 982 * 12 / 100; //56.34
+var aritmetica3: double = 123 * 6 + 7 - 4 / 2 + 65 - 812 - 42 / 1 + 32 % 2 * 2 ** 10; // -46
+
+
+//ahora vamos con las relacionales
+var relacional1: bool = (12 + 5 * 3) >= (56 * 5 / 21); //true
+var relacional2: bool = (aritmetica1 + aritmetica3) == (aritmetica2 * 5); //false
+relacional3 = ((17 * 86 - 25 + 22 / 11) == 20) < true; //false
+relacional4 = 'a' != (20 * 4); //el ascii de a es 97 y da false
+
+//y terminamos con las logicas
+logica1 = (!!!!!!!!!!!!!!!!!!(!false)) == true; //true
+var logica2: bool = ((true && true) || ((false && false) && (false == true))) || (!true); //true
+logica3 = (true || false) && relacional1 && false ^ false; // falso
+
+//generamos las salidas
+println("***\t\tCalificacion Fase 1\t\t***\n");
+println("\'Operaciones aritmeticas\'");
+println("Aritmetica1 " + (aritmetica1 == 61));
+println("Aritmetica2 " + (aritmetica2 == 56.34));
+println("Aritmetica3 " + (aritmetica3 == -46));
+println("");
+
+println("\"Operaciones relacionales\"");
+println("Relacional1 " + relacional1);
+println("Relacional2 " + relacional2);
+println("Relacional3 " + relacional3);
+println("Relacional4 " + relacional4);
+
+println("\\Operaciones logicas\\");
+println("Logica1 " + logica1);
+println("Logica2 " + logica2);
+println("Logica3 " + logica3);
+
+println("");
+println("Valor por defecto " + (total == 0));

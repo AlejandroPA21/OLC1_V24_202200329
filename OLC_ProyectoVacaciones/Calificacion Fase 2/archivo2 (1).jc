@@ -1,0 +1,170 @@
+//declaramos las variables globales
+var vector: int[] = [100, 23, 54, 87, 64, 34, 78, 36, 14, 1];
+
+void recursiva2(int valor){
+    println("========= Recursiva 2 =========");
+    println("Resultado de fibonacci del valor " + valor + " es " + fibonacci(20));
+}
+
+int fibonacci(int n){
+    if (n > 1) {
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    } else if (n == 1) {
+        return 1;
+    } else if (n == 0) {
+        return 0;
+    } else {
+        println("Error en fibonacci");
+        return 0;
+    }
+}
+
+int recursiva3(int m, int n){
+    if ((m == 1) || (n == 1)) {
+        println("Contar Caminos (" + m + ", " + n + ") = 1");
+        return 1;
+    }
+    var resultado: int = recursiva3(m - 1, n) + recursiva3(m, n - 1);
+    println("Contar Caminos (" + m + ", " + n + ") = Contar Caminos(" + (m - 1) + ", " + n + ") + Contar Caminos(" + m + ", " + (n - 1) + ") = " + resultado);
+    return resultado;
+
+}
+
+void main(){
+    println("-----------------CALIFICACION ARCHIVO 2-----------------\n");
+    recursivas();
+    println("");
+    vector1();
+    println("");
+    matriz();
+
+}
+
+void recursivas(){
+    recursiva2(20);
+    println("");
+    println("========= Recursiva 3 =========");
+    var m: int = 3;
+    var n: int = 3;
+    println("La cantidad de caminos en una cuadricula de " + m + "x" + n + " es: " + recursiva3(m, n));
+    println("");
+}
+
+void swap(int i, int j){
+    const temp: int = vector[i];
+    vector[i] = vector[j];
+    vector[j] = temp;
+    return;
+}
+
+int particion(int menor, int mayor){
+    var pivote: int = vector[mayor];
+    var i: int = menor - 1;
+    var j: int = menor;
+    for (j = menor; j <= mayor; j++) {
+        if (vector[j] < pivote) {
+            i++;
+            swap(i, j);
+        }
+    }
+    swap(i + 1, mayor);
+    return (i + 1);
+}
+
+void quickSort(int menor, int mayor){
+    if (menor < mayor) {
+        var pi: int = particion(menor, mayor);
+        quickSort(menor, pi - 1);
+        quickSort(pi + 1, mayor);
+    }
+}
+
+void imprimirVector(){
+    var i: int;
+    var cadena: string = "[";
+    for (i = 0; i < length(vector); i++) {
+        cadena = cadena + " " + vector[i];
+    }
+    cadena = cadena + " ]";
+    println(cadena);
+}
+
+void vector1(){
+    println("========= Vector desordenado =========");
+    imprimirVector();
+    println("");
+    println("========= Vector ordenado =========");
+    var n: int = length(vector);
+    quickSort(0, n - 1);
+    imprimirVector();
+}
+
+var vector2: char[][] = [
+    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '4'],
+    ['.', '.', '.', '.', '.', '.', '.', '.', '2', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', 'J', '.', '.'],
+    ['.', '.', '.', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', '.', '1', '.', '.', '.', '.'],
+    ['.', '.', '.', '.', 'I', '.', '.', '.', '.', '.'],
+    ['.', '.', '.', 'P', '.', '.', '.', '.', '.', '.'],
+    ['.', '.', 'M', '.', '.', '.', '.', '.', '.', '.'],
+    ['.', 'O', '.', '.', '.', '.', '.', '.', '.', '.'],
+    ['C', '.', '.', '.', '.', '.', '.', '.', '.', '.']
+];
+
+void voltearFilas(){
+    //longitud de la matriz
+    const longitud: int = length(vector2);
+
+    var x: int;
+    // tomamos hasta la mitad del arreglo
+    for (x = 0; x < (( longitud) / 2); x++) {
+        //almacenamos temporal
+        var temporal: char[] = [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '];
+        const longitud2: int = length(temporal);
+        var contadorCiclo: int = 0;
+        for (contadorCiclo = 0; contadorCiclo < longitud2; contadorCiclo++) {
+            temporal[contadorCiclo] = vector2[x][contadorCiclo];
+        }
+
+        // calcular el índice contrario
+        var indiceContrario: int = longitud - x - 1;
+        //intercambiamos posiciones
+        for (contadorCiclo = 0; contadorCiclo < longitud2; contadorCiclo++) {
+            vector2[x][contadorCiclo] = vector2[indiceContrario][contadorCiclo];
+            vector2[indiceContrario][contadorCiclo] = temporal[contadorCiclo];
+        }
+    }
+}
+
+void imprimirMatriz(){
+    var i: int = 0;
+    var j: int = 0;
+
+    for (i = 0; i < length(vector2); i++) {
+        var linea: string = "";
+        const longitud: int = length(vector2[i]);
+        for (j = 0; j < longitud; j++) {
+            linea = linea + " " + vector2[i][j] + " ";
+        }
+        println(linea);
+    }
+
+ for (i = 0; i < length(vector2); i++) {
+        var linea: string = "";
+        const longitud: int = length(vector2[i]);
+        for (j = 0; j < longitud; j++) {
+            linea = linea + " " +((int) vector2[i][j] )+ " ";
+        }
+        println(linea);
+    }
+
+}
+
+void matriz(){
+    println("========= Vector de 2 dimensiones =========");
+    voltearFilas();
+    imprimirMatriz();
+}
+
+START_WITH main();

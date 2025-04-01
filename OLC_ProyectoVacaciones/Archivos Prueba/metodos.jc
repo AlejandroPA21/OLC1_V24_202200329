@@ -1,0 +1,36 @@
+var global: int = 10;
+START_WITH miFuncion(global, 20);
+
+void miFuncion(int za, int ma) {
+    println(za);
+    println(ma);
+    println(global);
+    var pr: double = 15.5521;
+    var str : string = "holaMundo";
+    var vec : int [][] = [[1,2],[3,4]];
+    var in : int = round(pr);
+    var in2 : int = round(5);
+    var in3 : int = length("holamundo");
+    var in4 : int = length(vec);
+    var in5 : int = length(str);
+     println("probando round  "+in);
+     println("probando round  "+in2);
+     println("probando length  "+in3);
+     println("probando length  "+in4);
+     println("probando length  "+in5);
+     var str2 : string = toString(vec);
+    
+     println("Probando toString"+ str2);
+
+     println(vec.find(5));
+    if (za == 10) {
+        var v: int = 20;
+        miFuncion2(v);
+    }
+}
+
+void miFuncion2(int a) {
+    println("Mi funcion 2");
+    println(global);
+    println(a);
+}

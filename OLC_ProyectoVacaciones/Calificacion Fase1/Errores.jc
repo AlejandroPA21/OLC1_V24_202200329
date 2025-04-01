@@ -1,0 +1,64 @@
+/*
+    Area de Errores Lexicos
+        Estos son los caracteres o simbolos
+        que no forman parte del lenguaje
+*/
+var i: int = 10;
+$ // este es error lexico
+
+const nota: double = (double) 100;
+
+if (nota >= 61) {
+    println("Aprobado");?
+} else {
+    println("Reprobado"¡);
+}
+while (i < 12) {
+    println(Ç i);
+    i = i + 1°;
+}
+
+/* 
+    Area de Errores Semanticos
+        Estos son errores de sentido 
+*/
+//error de expresion del if
+if (3 * 6 + 7) {
+    println("No me recupere de errores semanticos :(");
+}
+
+//error de modificacion de constantes
+nota = nota * 10 / 10 + (1 - (10 - 9));
+
+//error en expresion de while
+while (10 + 10) {
+    println("No me recupere de errores semanticos :(");
+}
+
+
+//error en declaracion de variables
+var error2: int = "true";
+const error2: string = true;
+var error3: bool = 10;
+const error4: char = "String";
+
+// error en la asignacion de variables
+var miVariable: int = 10;
+miVariable = "Hola Mundo";
+miVariable = true;
+miVariable = 'a';
+
+
+// errores anidados
+var contador: int = 0;
+while (contador < 5) {
+
+    if (contador == 2) {
+        contador = "Hola Mundo";
+    } else if (contador == 3) {
+        contador = true;
+    } else {
+        println("contador");
+    }
+    contador++;
+}

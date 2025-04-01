@@ -1,0 +1,59 @@
+Struct{
+    nombre: string;
+    edad: int;
+    estatura: double;
+} persona;
+
+START_WITH main();
+
+var global: int = 10;
+
+void main(){
+    println("Archivo de prueba 2 - Fase 2");
+    println("");
+    //hacemos una suma con la funcion
+    var a: int = suma(1, global); //debe almacenar 11
+    println("El resultado de la suma es: " + a);
+    println("");
+    miMetodo();
+
+
+}
+
+void miMetodo(){
+    //aqui vamos a tener los structs
+    var p1: persona = { nombre: "Luis", edad: 20, estatura: 1.60 };
+    const p2: persona = { nombre: "Maria", edad: 25, estatura: 1.50 };
+
+    println("La persona " + p1.nombre + " tiene " + p1.edad + " años");
+    println("La persona " + p2.nombre + " tiene " + p2.edad + " años");
+
+    var id1: identificacion = { cui: "3548265470101", p: p1 };
+    const id2: identificacion = { cui: "3748614591201", p: { nombre: "Jorge", edad: 23, estatura: 1.70 } };
+
+    println("La persona " + id1.p.nombre + " se identifica con el cui " + id1.cui);
+    println("La persona " + id2.p.nombre + " se identifica con el cui " + id2.cui);
+
+}
+
+int suma(int a, int b){
+    return a + b;
+}
+
+Struct{
+    cui: string;
+    p: persona;
+} identificacion;
+
+// Salida esperada
+/*
+Archivo de prueba 2 - Fase 2
+
+El resultado de la suma es: 11
+
+La persona Luis tiene 20 años
+La persona Maria tiene 25 años
+La persona Luis se identifica con el cui 3548265470101
+La persona Jorge se identifica con el cui 3748614591201
+
+*/

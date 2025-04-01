@@ -1,0 +1,316 @@
+struct {
+    marca: string;
+    modelo: string;
+    anio: int;
+    color: string;
+} Carro;
+
+struct {
+    nombre: string;
+    edad: int;
+    descripcion: string;
+    carro_: Carro;
+} Persona;
+
+
+int recursiva4(int m, int n){
+    if (m == 0) {
+        return n + 1;
+    } else if ((m > 0) && (n == 0)) {
+        return recursiva4(m - 1, 1);
+    } else {
+        return recursiva4(m - 1, recursiva4(m, n - 1));
+    }
+}
+
+
+void main(){
+    println("-----------------CALIFICACION ARCHIVO 3-----------------\n");
+    println("========= Recursiva 4 =========");
+    println("Resultado de recursiva4: " + recursiva4(3, 4));
+    println("");
+    MetodoStruct();
+    println("");
+    ListasDinamicas();
+    println("");
+    FuncionesNativas();
+
+}
+
+void MetodoStruct(){
+    // creando carros
+    var c1: Carro = { marca: "Toyota", modelo: "Corolla", anio: 2019, color: "Rojo" };
+    var c2: Carro = { marca: "Honda", modelo: "Civic", anio: 2018, color: "Azul" };
+    var c3: Carro = { marca: "Nissan", modelo: "Sentra", anio: 2017, color: "Blanco" };
+    var c4: Carro = { marca: "Chevrolet", modelo: "Spark", anio: 2016, color: "Amarillo" };
+
+    // imprimiendo carros
+    println("========= Carro 1 =========");
+    println("Marca: " + c1.marca);
+    println("Modelo: " + c1.modelo);
+    println("Anio: " + c1.anio);
+    println("Color: " + c1.color);
+
+    println("");
+
+    println("========= Carro 2 =========");
+    println("Marca: " + c2.marca);
+    println("Modelo: " + c2.modelo);
+    println("Anio: " + c2.anio);
+    println("Color: " + c2.color);
+
+    println("");
+
+    println("========= Carro 3 =========");
+    println("Marca: " + c3.marca);
+    println("Modelo: " + c3.modelo);
+    println("Anio: " + c3.anio);
+    println("Color: " + c3.color);
+
+    println("");
+
+    println("========= Carro 4 =========");
+    println("Marca: " + c4.marca);
+    println("Modelo: " + c4.modelo);
+    println("Anio: " + c4.anio);
+    println("Color: " + c4.color);
+
+    println("");
+
+
+    var anios: int[] = [c1.anio, c2.anio, c3.anio, c4.anio];
+    var marcasModelos: string[] = [
+        c1.marca + " " + c1.modelo,
+        c2.marca + " " + c2.modelo,
+        c3.marca + " " + c3.modelo,
+        c4.marca + " " + c4.modelo];
+
+    var i: int = 0;
+    var max: int = 9999;
+    var j: int = 0;
+    for (i = 0; i < length(anios); i = i + 1;) {
+        if (anios[i] < max) {
+            max = anios[i];
+            j = i;
+        }
+    }
+
+    println("El carro mas antiguo es: "+ marcasModelos[j]);
+
+    c1.color = "Verde";
+    c2.color = "Rojo";
+    c3.color = "Amarillo"; // debe dar error semantico
+    c4.color = "Azul";
+
+    if (c3.color != "Blanco") {
+        println("No validaste la mutabilidad :(");
+    }
+
+    /*
+    Si llegaste hasta aqui, felicidades
+    Aqui tienes la mitad del punteo :D
+    */
+
+
+    // creando personas
+    var p1: Persona = {
+        nombre: "Juan",
+        edad: 20,
+        descripcion: "Quiere ganar compi1",
+        carro_: c1
+    };
+
+    var p2: Persona = {
+        nombre: "Luis",
+        edad: 25,
+        descripcion: "Se piensa pasar a industrial",
+        carro_: {
+            marca: "Chevrolet",
+            modelo: "Spark",
+            anio: 2016,
+            color: "Amarillo"
+        }
+    };
+
+    const p3: Persona = {
+        nombre: "Pedro",
+        edad: 24,
+        descripcion: "Dejo sistemas porque no le gusto",
+        carro_: c3
+    };
+
+    const p4: Persona = {
+        nombre: "Arturo",
+        edad: 23,
+        descripcion: "Sigue luchando por sus sueños",
+        carro_: {
+            marca: "Toyota",
+            modelo: "Corolla",
+            anio: 2019,
+            color: "Rojo"
+        }
+    };
+
+    // Imprimiendo personas
+    println("========= Persona 1 =========");
+    println("Nombre: " + p1.nombre);
+    println("Edad: " + p1.edad);
+    println("Descripcion: " + p1.descripcion);
+    println("Carro: " + p1.carro_.marca + " " + p1.carro_.modelo + " " + p1.carro_.anio + " " + p1.carro_.color);
+
+    println("");
+
+    println("========= Persona 2 =========");
+    println("Nombre: " + p2.nombre);
+    println("Edad: " + p2.edad);
+    println("Descripcion: " + p2.descripcion);
+    println("Carro: " + p2.carro_.marca + " " + p2.carro_.modelo + " " + p2.carro_.anio + " " + p2.carro_.color);
+
+    println("");
+
+    println("========= Persona 3 =========");
+    println("Nombre: " + p3.nombre);
+    println("Edad: " + p3.edad);
+    println("Descripcion: " + p3.descripcion);
+    println("Carro: " + p3.carro_.marca + " " + p3.carro_.modelo + " " + p3.carro_.anio + " " + p3.carro_.color);
+    println("");
+
+    println("========= Persona 4 =========");
+    println("Nombre: " + p4.nombre);
+    println("Edad: " + p4.edad);
+    println("Descripcion: " + p4.descripcion);
+    println("Carro: " + p4.carro_.marca + " " + p4.carro_.modelo + " " + p4.carro_.anio + " " + p4.carro_.color);
+    println("");
+
+    var edades: int[] = [p1.edad, p2.edad, p3.edad, p4.edad];
+    var nombres: string[] = [p1.nombre, p2.nombre, p3.nombre, p4.nombre];
+
+    i = 0;
+    max = 0;
+    j = 0;
+    for (i = 0; i < length(edades); i = i + 1;) {
+        if (edades[i] > max) {
+            max = edades[i];
+            j = i;
+        }
+    }
+
+    println("La persona con mayor edad es: " + nombres[j]);
+
+    p1.carro_.anio = 2020;
+
+    if (p1.carro_.anio != 2020) {
+        println("No actualizaste el valor :(");
+    }
+}
+
+void ListasDinamicas(){
+    println("========= Listas Dinamicas =========");
+    List < int > misNotas = new List();
+    misNotas.append(75);
+    misNotas.append(80);
+    misNotas.append(61);
+    misNotas.append(90);
+    misNotas.append(72);
+    misNotas.append(69);
+
+    var i: int = 0;
+    var promedio: double = 0.0;
+    for (i = 0; i < length(misNotas); i = i + 1;) {
+        promedio = promedio + misNotas[i];
+    }
+    promedio = promedio / length(misNotas);
+
+    println("Promedio de notas: " + promedio);
+
+    misNotas.append(100);
+    misNotas.append(50);
+    misNotas.append(80);
+
+    for (i = 0; i < length(misNotas); i = i + 1;) {
+        promedio = promedio + misNotas[i];
+    }
+    promedio = promedio / length(misNotas);
+
+    println("Mi nuevo promedio de notas: " + promedio);
+
+    const error1: int = misNotas.remove(6); // almacena 100
+    const error2: int = misNotas.remove(6); // almacena 50
+    const error3: int = misNotas.remove(6); // almacena 80
+
+    if ((error1 != 100) || (error2 != 50) ||( error3 != 80)) {
+        println("No se eliminaron los elementos correctos :(");
+    }
+
+    if (length(misNotas) != 6) {
+        println("No se eliminaron los elementos correctamente :(");
+    }
+
+    var cadena: string = "[";
+    for (i = 0; i < length(misNotas); i = i + 1;) {
+        cadena = cadena + " " + misNotas[i];
+    }
+    cadena = cadena + "]";
+    println("Lista de notas: " + cadena);
+
+
+}
+
+void FuncionesNativas(){
+    println("========= Round =========");
+    var original: double = 60.51;
+    var redondeado: int = round(original);
+
+    println("Original: " + original);
+    println("Redondeado: " + redondeado);
+
+    original = 60.49;
+    redondeado = round(original);
+
+    println("");
+
+    println("Original: " + original);
+    println("Redondeado: " + redondeado);
+
+    println("");
+
+    println("========= Length =========");
+    const cadena: string = "Hola Mundo";
+    println("Longitud de la cadena: " + length(cadena));
+
+    println("");
+
+    println("========= ToString =========");
+    const numero: int = 123;
+    const booleano: bool = true;
+    const caracter: char = 'a';
+    const c1: Carro = { marca: "Toyota", modelo: "Corolla", anio: 2019, color: "Rojo" };
+
+    var cadena2: string = "";
+    cadena2 = toString(numero) + "\n";
+    cadena2 = cadena2 + toString(booleano) + "\n";
+    cadena2 = cadena2 + toString(caracter) + "\n";
+    cadena2 = cadena2 + toString(c1) + "\n";
+
+    println(cadena2);
+
+    println("");
+
+    println("========= Find =========");
+    const arreglo: int[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    List < string > lista = new List();
+    lista.append("Hola");
+    lista.append("Mundo");
+    lista.append("Compiladores");
+    lista.append("2024");
+
+    if ( (lista.find("Compiladores")) && (arreglo.find(5))) {
+        println("Se encontraron los elementos");
+    } else {
+        println(lista);
+        println("No se encontraron los elementos");
+    }
+}
+
+
+START_WITH main();

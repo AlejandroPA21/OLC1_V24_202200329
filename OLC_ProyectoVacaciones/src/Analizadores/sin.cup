@@ -1,0 +1,441 @@
+package Analizadores;
+
+import java_cup.runtime.*;
+import java.util.LinkedList;
+import java.util.HashMap;
+import abstracto.Instruccion;
+import expresiones.Aritmeticas;
+import expresiones.Logicas;
+import expresiones.Nativo;
+import expresiones.Relacionales;
+import expresiones.operadoresAritmeticos;
+import expresiones.OperadoresLogicos;
+import expresiones.OperadoresRelacionales;
+import expresiones.Casteo;
+import expresiones.AccesoVariable;
+import instrucciones.Print;
+import instrucciones.DeclaracionVariable;
+import instrucciones.AsignacionVariable;
+import instrucciones.Incremento;
+import instrucciones.Decremento;
+import instrucciones.If;
+import instrucciones.Caso;
+import instrucciones.Match;
+import instrucciones.For;
+import instrucciones.While;
+import instrucciones.DoWhile;
+import instrucciones.Break;
+import instrucciones.Continue;
+import instrucciones.DeclaracionVector;
+import excepciones.Errores;
+import expresiones.vectores.AccesoVector;
+import instrucciones.AsignacionVector;
+import instrucciones.DeclaracionLista;
+import instrucciones.listas.Append;
+import expresiones.fnativas.Remove;
+
+import instrucciones.Funcion;
+import instrucciones.Start;
+import instrucciones.Llamada;
+import instrucciones.Return;
+
+
+import instrucciones.structs.Struct;
+import instrucciones.structs.Instanciacion;
+import expresiones.AccesoStruct;
+import instrucciones.structs.Asignacion;
+
+
+
+import expresiones.fnativas.Round;
+import expresiones.fnativas.Length;
+import expresiones.fnativas.ToString;
+import expresiones.fnativas.Find;
+
+
+import simbolo.*;
+
+
+parser code
+{:
+    scanner s;
+    parser(scanner s){this.s = s;}
+
+    public LinkedList<Errores> listaErrores = new LinkedList<>();
+    
+    public void syntax_error(Symbol s){
+        listaErrores.add(new Errores("SINTACTICO RECUPERABLE",
+                        "No se esperaba el componente "+s.value,
+                        s.left,
+                        s.right));
+    }
+
+    public void unrecovered_syntax_error (Symbol s){
+        listaErrores.add(new Errores("SINTACTICO NO RECUPERABLE",
+                        "No se esperaba el componente "+s.value,
+                        s.left,
+                        s.right));
+    }
+
+
+:}
+
+
+
+// Terminales
+terminal String MENOS, MAS, POR, DIVIDIDO, MODULO, IGUAL, MAYOR, MENOR,
+         XOR, GUIONBAJO, PARENTESIS1, PARENTESIS2, LLAVE1, LLAVE2, PUNTOYCOMA,
+         DOSPUNTOS, COMA, CORCHETE1, CORCHETE2, NOT, AND, OR, DOUBLET,
+         INTT, STRINGT, BOOLT, CHART, VERDADERO, FALSO, VARR, CONSTR, IFR, ELSER, MATCH, WHILER,
+         FORR, DOR, BREAKR, CONTINUER, PRINTR, IDENTIFICADOR, DECIMAL, ENTERO, CADENA,
+         COMENTARIO, COMENTARIO_MULTILINEA, UMENOS, EQUAL, DIF, MAYORIGUAL, MENORIGUAL, NOP
+         , MASP, MENOSP, MEN, MAY, CARACTER, POTENCIA, CASTEO;
+
+terminal String NEW, LIST, PUNTO, APPEND, REMOVE, VOID;
+
+terminal String STRUCT;
+
+terminal String START, RETURN;
+
+terminal String ROUND, LENGTH, TOSTRING, FIND;
+
+// No terminales
+nonterminal LinkedList<Instruccion> INICIO, INSTRUCCIONES;
+nonterminal Instruccion INSTRUCCION;
+nonterminal Instruccion IMPRECION;
+nonterminal Instruccion EXPRESION;
+nonterminal Instruccion DECLARACIONV, ASIGNACIONV;
+nonterminal Instruccion ACTUALIZACIONV;
+nonterminal Instruccion IF_P;
+nonterminal Tipo TIPO;
+nonterminal Caso CASO, CASO_DEFECTO;
+nonterminal LinkedList<Caso> CASOS ;
+nonterminal Instruccion MATCH_P;
+nonterminal Instruccion FOR_P, ACT, WHILE_P, DOWHILE_P, BREAK_P, CONINUE_P;
+nonterminal Instruccion DECLARACION_VECTOR, ACCESO_VECTOR;
+nonterminal LinkedList<Object> LISTA_VALORES, LISTA_VALORES2;
+//operacuibes cn vectores
+nonterminal Instruccion ASIG_VECTOR, ASIG_LISTA;
+//operaciones con listas
+nonterminal Instruccion APPEND_LIST, REMOVE_LIST;
+// METODOS O FUNCIONES
+nonterminal Instruccion METODOS_FUNCIONES;
+nonterminal LinkedList<HashMap> PARAMS;
+nonterminal Instruccion START_FUNCION;
+nonterminal LinkedList<Instruccion> PARAMSCALL;
+nonterminal Instruccion LLAMADA;
+nonterminal Instruccion RETURN_INS;
+//Structs 
+nonterminal Instruccion STRUCTS, INSTANCIACION_STRUCT, ACCESO_STRUCT, ASIGNACION_STRUCT;
+nonterminal HashMap<String, Object> STRUCTS_LIST;
+nonterminal HashMap<String, Object> VALORES_STRUCT;
+
+// Funciones nativas
+nonterminal Instruccion ROUND_EXP, LENGTH_EXP, TOSTRING_EXP, FIND_EXP;
+
+//Precedencia
+precedence left OR;
+precedence left AND;
+precedence left XOR;
+precedence right NOP;
+precedence left EQUAL ,DIF,MEN,MENORIGUAL,MAY,MAYORIGUAL;
+precedence left MASP, MENOSP;
+precedence left POR, DIVIDIDO, MODULO;
+precedence nonassoc POTENCIA;
+precedence right UMENOS;
+precedence nonassoc CASTEO;
+
+start with INICIO;
+
+INICIO ::= INSTRUCCIONES:a {:RESULT = a;:}
+;
+INSTRUCCIONES ::= INSTRUCCIONES:a INSTRUCCION:b {: RESULT = a; RESULT.add(b); :}
+                | INSTRUCCION:a {: RESULT = new LinkedList<>(); RESULT.add(a); :}
+;
+
+INSTRUCCION ::= IMPRECION:a {: RESULT=a;:}
+                | DECLARACIONV:a {: RESULT=a;:}
+                | ASIGNACIONV:a {: RESULT=a;:}
+                | ACTUALIZACIONV:a {: RESULT=a;:}
+                | IF_P:a {: RESULT=a;:}
+                | MATCH_P:a {: RESULT=a;:}
+                | FOR_P:a {: RESULT=a; :}
+                | WHILE_P:a {: RESULT=a; :}
+                | DOWHILE_P:a {: RESULT=a; :}
+                | BREAK_P:a {: RESULT=a; :}
+                | CONINUE_P:a {: RESULT=a; :}
+                | DECLARACION_VECTOR:a {: RESULT=a; :}
+                | ASIG_VECTOR:a {: RESULT=a; :}
+                | ASIG_LISTA:a {: RESULT=a; :}
+                | APPEND_LIST:a {: RESULT=a; :}
+                | METODOS_FUNCIONES :a {: RESULT=a; :}
+                | START_FUNCION:a {: RESULT=a; :}
+                | LLAMADA:a PUNTOYCOMA {: RESULT=a; :}
+                | STRUCTS:a {: RESULT=a; :}
+                | INSTANCIACION_STRUCT:a {: RESULT=a; :}
+                | ASIGNACION_STRUCT:a {: RESULT=a; :}
+                | RETURN_INS:a  {: RESULT=a; :}
+                | error PUNTOYCOMA
+;
+
+IMPRECION ::= PRINTR  PARENTESIS1 EXPRESION:a PARENTESIS2 PUNTOYCOMA {: RESULT = new Print(a, aleft, aright); :}
+;
+
+EXPRESION ::= MENOS EXPRESION:a {:  RESULT = new Aritmeticas(a, operadoresAritmeticos.NEGACION,  aleft, aright);:} %prec UMENOS 
+            | EXPRESION:a MAS EXPRESION:b {:  RESULT = new Aritmeticas(a,b, operadoresAritmeticos.SUMA,  aleft, aright); :} %prec MASP
+            | EXPRESION:a MENOS EXPRESION:b {:  RESULT = new Aritmeticas(a,b, operadoresAritmeticos.RESTA,  aleft, aright); :} %prec MENOSP
+            | EXPRESION:a POR EXPRESION:b {:  RESULT = new Aritmeticas(a,b ,operadoresAritmeticos.MULTIPLICACION,  aleft, aright); :}
+            | EXPRESION:a DIVIDIDO EXPRESION:b {: RESULT = new Aritmeticas(a,b, operadoresAritmeticos.DIVISION,  aleft, aright); :}
+            | EXPRESION:a MODULO EXPRESION:b {: RESULT = new Aritmeticas(a,b, operadoresAritmeticos.MODULO,  aleft, aright); :}
+            | EXPRESION:a POR POR EXPRESION:b {: RESULT = new Aritmeticas(a,b, operadoresAritmeticos.POTENCIA,  aleft, aright); :} %prec POTENCIA
+            | PARENTESIS1 TIPO:a PARENTESIS2 EXPRESION:b {: RESULT = new Casteo(a, b, aleft,aright ); :} %prec CASTEO
+            | EXPRESION:a IGUAL IGUAL EXPRESION:b {:   RESULT = new Relacionales(a, b, OperadoresRelacionales.IGUALACION, aleft, aright); :}%prec EQUAL
+            | EXPRESION:a NOT IGUAL EXPRESION:b {: RESULT = new Relacionales(a, b, OperadoresRelacionales.DIFERENCIACION, aleft, aright); :}%prec DIF
+            | EXPRESION:a MENOR EXPRESION:b {:  RESULT = new Relacionales(a, b, OperadoresRelacionales.MENORQUE, aleft, aright); :}%prec MEN
+            | EXPRESION:a MAYOR EXPRESION:b {:  RESULT = new Relacionales(a, b, OperadoresRelacionales.MAYORQUE, aleft, aright); :}%prec MAY
+            | EXPRESION:a MENOR IGUAL EXPRESION:b {:  RESULT = new Relacionales(a, b, OperadoresRelacionales.MENORIGUAL, aleft, aright); :}%prec MENORIGUAL
+            | EXPRESION:a MAYOR IGUAL EXPRESION:b {: RESULT = new Relacionales(a, b, OperadoresRelacionales.MAYORIGUAL, aleft, aright); :}%prec MAYORIGUAL
+            | NOT EXPRESION:a {: RESULT = new Logicas(a, OperadoresLogicos.NOT, aleft, aright); :} %prec NOP
+            | EXPRESION:a AND EXPRESION:b {: RESULT = new Logicas(a, b, OperadoresLogicos.AND, aleft, aright); :}
+            | EXPRESION:a OR  EXPRESION:b {:  RESULT = new Logicas(a, b, OperadoresLogicos.OR, aleft, aright); :}
+            | EXPRESION:a XOR EXPRESION:b {: RESULT = new Logicas( a, b, OperadoresLogicos.XOR, aleft, aright );:}
+            | IDENTIFICADOR:a  {: RESULT = new AccesoVariable(a, aleft, aright); :}
+            | DECIMAL:a {: RESULT = new Nativo(new Double(a), new Tipo(tipoDato.DECIMAL), aleft, aright); :}
+            | ENTERO:a  {: RESULT = new Nativo(Integer.parseInt(a), new Tipo(tipoDato.ENTERO), aleft, aright); :}
+            | CARACTER:a  {: RESULT = new Nativo(a.charAt(0), new Tipo(tipoDato.CARACTER), aleft, aright); :}
+            | CADENA:a  {: RESULT = new Nativo(a, new Tipo(tipoDato.CADENA), aleft, aright); :}
+            | VERDADERO:a {: RESULT = new Nativo(true, new Tipo(tipoDato.BOOL), aleft, aright); :}
+            | FALSO:a {: RESULT = new Nativo(false, new Tipo(tipoDato.BOOL), aleft, aright);:}
+            | PARENTESIS1 EXPRESION:a PARENTESIS2 {: RESULT=a;:}
+            | ACCESO_VECTOR:a {: RESULT = a; :}
+            | ACCESO_STRUCT:a {: RESULT = a; :}
+            | REMOVE_LIST:a {: RESULT = a; :}
+            | LLAMADA:a {: RESULT = a; :}
+            | ROUND_EXP:a {: RESULT = a; :}
+            | LENGTH_EXP:a {: RESULT = a; :}
+            | TOSTRING_EXP:a {: RESULT = a; :}
+            | FIND_EXP:a {: RESULT = a; :}
+            
+;           
+
+TIPO ::= INTT:a {: RESULT = new Tipo(tipoDato.ENTERO); :}
+        | DOUBLET:a {: RESULT = new Tipo(tipoDato.DECIMAL); :}
+        | STRINGT:a {: RESULT = new Tipo(tipoDato.CADENA); :}
+        | CHART:a {: RESULT = new Tipo(tipoDato.CARACTER); :}
+        | BOOLT:a {: RESULT = new Tipo(tipoDato.BOOL); :}
+        | VOID:a {: RESULT = new Tipo(tipoDato.VOID); :}
+      ;
+
+
+DECLARACIONV ::= VARR IDENTIFICADOR:a DOSPUNTOS TIPO:b IGUAL EXPRESION:c PUNTOYCOMA {: RESULT = new DeclaracionVariable(a, b, c,true, aleft, aright); :}
+                | VARR IDENTIFICADOR:a DOSPUNTOS TIPO:b PUNTOYCOMA {: RESULT = new DeclaracionVariable(a, b, true,aleft, aright); :}
+                | CONSTR IDENTIFICADOR:a DOSPUNTOS TIPO:b IGUAL EXPRESION:c PUNTOYCOMA {: RESULT = new DeclaracionVariable(a, b, c,false, aleft, aright); :}
+                | CONSTR IDENTIFICADOR:a DOSPUNTOS TIPO:b PUNTOYCOMA {: RESULT = new DeclaracionVariable(a, b, false, aleft, aright); :}
+;
+    
+ASIGNACIONV ::= IDENTIFICADOR:a IGUAL EXPRESION:b PUNTOYCOMA {: RESULT = new AsignacionVariable(a, b, aleft, aright); :}
+                ;
+
+ACTUALIZACIONV ::= IDENTIFICADOR:a MAS MAS  {: RESULT = new Incremento(a, aleft, aright); :}
+                |   IDENTIFICADOR:a MENOS MENOS {: RESULT = new Decremento(a, aleft, aright); :}
+                |   IDENTIFICADOR:a MAS MAS PUNTOYCOMA {: RESULT = new Incremento(a, aleft, aright); :}
+                |   IDENTIFICADOR:a MENOS MENOS PUNTOYCOMA {: RESULT = new Decremento(a, aleft, aright); :}
+                
+                ;
+
+
+// Sentencias de control 
+//IF
+IF_P ::=  IFR PARENTESIS1 EXPRESION:a PARENTESIS2 LLAVE1 INSTRUCCIONES:b LLAVE2 {: RESULT = new If(a, b, aleft, aright); :}
+        | IFR PARENTESIS1 EXPRESION:a PARENTESIS2 LLAVE1 INSTRUCCIONES:b LLAVE2 ELSER LLAVE1 INSTRUCCIONES:c LLAVE2 {: RESULT = new If(a, b, c, aleft, aright); :}  
+        | IFR PARENTESIS1 EXPRESION:a PARENTESIS2 LLAVE1 INSTRUCCIONES:b LLAVE2 ELSER IF_P:c  {: RESULT = new If(a, b, c, aleft, aright); :}
+;
+//MATCH
+
+MATCH_P ::= MATCH EXPRESION:a LLAVE1 CASOS:b CASO_DEFECTO:c LLAVE2 {: RESULT = new Match(a, b, c, aleft, aright); :}
+            | MATCH EXPRESION:a LLAVE1 CASOS:b LLAVE2 {: RESULT = new Match(a, b, aleft, aright); :}
+            | MATCH EXPRESION:a LLAVE1 CASO_DEFECTO:b LLAVE2 {: RESULT = new Match(a, b, aleft, aright); :};
+
+CASOS ::= CASOS:a CASO:b {: RESULT = a; RESULT.add(b); :}
+        | CASO:a {: RESULT = new LinkedList<>(); RESULT.add(a); :};
+
+CASO ::= EXPRESION:a IGUAL MAYOR LLAVE1 INSTRUCCIONES:b LLAVE2{: RESULT = new Caso(a, b, true, aleft, aright); :};
+
+CASO_DEFECTO ::= GUIONBAJO IGUAL MAYOR LLAVE1 INSTRUCCIONES:a LLAVE2 {: RESULT = new Caso(a, false, aleft, aright); :};
+
+//ciclos 
+
+FOR_P ::= FORR PARENTESIS1 ASIGNACIONV:a EXPRESION:b PUNTOYCOMA ACT:c PARENTESIS2 LLAVE1 INSTRUCCIONES:d LLAVE2{: RESULT = new For(a, b, c, d, aleft, aright);:};
+
+ACT ::= ACTUALIZACIONV:a {: RESULT = a; :}
+        | ASIGNACIONV: a {: RESULT = a; :};
+
+WHILE_P ::= WHILER PARENTESIS1 EXPRESION:a PARENTESIS2 LLAVE1 INSTRUCCIONES:b LLAVE2 {: RESULT = new While(a, b, aleft, aright); :};
+
+DOWHILE_P ::= DOR LLAVE1 INSTRUCCIONES:a LLAVE2 WHILER PARENTESIS1 EXPRESION:b PARENTESIS2 PUNTOYCOMA {: RESULT = new DoWhile(b,a, aleft, aright); :};
+
+BREAK_P ::= BREAKR:a PUNTOYCOMA {: RESULT = new Break(aleft, aright); :};
+
+CONINUE_P ::= CONTINUER:a PUNTOYCOMA {: RESULT = new Continue(aleft, aright); :};
+
+
+//Vectores
+
+DECLARACION_VECTOR ::= VARR IDENTIFICADOR:a DOSPUNTOS TIPO:b CORCHETE1 CORCHETE2 IGUAL CORCHETE1 LISTA_VALORES:c CORCHETE2 PUNTOYCOMA 
+                        {: RESULT = new DeclaracionVector(a, 1, c, true, b, aleft, aright); :}
+                | CONSTR IDENTIFICADOR:a DOSPUNTOS TIPO:b CORCHETE1 CORCHETE2 IGUAL CORCHETE1 LISTA_VALORES:c CORCHETE2 PUNTOYCOMA 
+                        {: RESULT = new DeclaracionVector(a, 1, c, false, b, aleft, aright); :}
+                |VARR IDENTIFICADOR:a DOSPUNTOS TIPO:b CORCHETE1 CORCHETE2 CORCHETE1 CORCHETE2 IGUAL CORCHETE1 LISTA_VALORES:c CORCHETE2 PUNTOYCOMA 
+                        {: RESULT = new DeclaracionVector(a, 2,  c, true, b, aleft, aright); :}
+                |CONSTR IDENTIFICADOR:a DOSPUNTOS TIPO:b CORCHETE1 CORCHETE2 CORCHETE1 CORCHETE2 IGUAL CORCHETE1 LISTA_VALORES:c CORCHETE2 PUNTOYCOMA 
+                        {: RESULT = new DeclaracionVector(a,2, c, false, b, aleft, aright); :}
+                | VARR IDENTIFICADOR:a DOSPUNTOS TIPO:b CORCHETE1 CORCHETE2 IGUAL IDENTIFICADOR:c PUNTOYCOMA
+                        {:RESULT = new DeclaracionVector(a,1, c, true, b, aleft, aright );:}
+                | CONSTR IDENTIFICADOR:a DOSPUNTOS TIPO:b CORCHETE1 CORCHETE2 IGUAL IDENTIFICADOR:c PUNTOYCOMA
+                        {:RESULT = new DeclaracionVector(a,1, c, false, b, aleft, aright );:}
+                | VARR IDENTIFICADOR:a DOSPUNTOS TIPO:b CORCHETE1 CORCHETE2 CORCHETE1 CORCHETE2 IGUAL IDENTIFICADOR:c PUNTOYCOMA
+                        {:RESULT = new DeclaracionVector(a,2, c, true, b, aleft, aright );:}
+                | CONSTR IDENTIFICADOR:a DOSPUNTOS TIPO:b CORCHETE1 CORCHETE2 CORCHETE1 CORCHETE2 IGUAL IDENTIFICADOR:c PUNTOYCOMA
+                        {:RESULT = new DeclaracionVector(a,2, c, false, b, aleft, aright );:}
+                | VARR IDENTIFICADOR:a DOSPUNTOS TIPO:b CORCHETE1 CORCHETE2 IGUAL ACCESO_VECTOR:c PUNTOYCOMA
+                        {:RESULT = new DeclaracionVector(a,1, c, true, b, aleft, aright );:}
+                | CONSTR IDENTIFICADOR:a DOSPUNTOS TIPO:b CORCHETE1 CORCHETE2 IGUAL ACCESO_VECTOR:c PUNTOYCOMA
+                        {:RESULT = new DeclaracionVector(a,1, c, false, b, aleft, aright );:}
+                | VARR IDENTIFICADOR:a DOSPUNTOS TIPO:b CORCHETE1 CORCHETE2 CORCHETE1 CORCHETE2 IGUAL ACCESO_VECTOR:c PUNTOYCOMA
+                        {:RESULT = new DeclaracionVector(a,2, c, true, b, aleft, aright );:}
+                | CONSTR IDENTIFICADOR:a DOSPUNTOS TIPO:b CORCHETE1 CORCHETE2 CORCHETE1 CORCHETE2 IGUAL ACCESO_VECTOR:c PUNTOYCOMA
+                        {:RESULT = new DeclaracionVector(a,2, c, false, b, aleft, aright );:}
+;
+
+
+
+
+LISTA_VALORES ::= LISTA_VALORES:a COMA EXPRESION:b {: RESULT = a; RESULT.add(b); :}
+                | LISTA_VALORES:a COMA LISTA_VALORES2:b {: RESULT = a; RESULT.add(b); :}
+                | LISTA_VALORES2:a  {: RESULT = new LinkedList<Object>(); RESULT.add(a);:}
+                | EXPRESION:a {: RESULT = new LinkedList<Object>(); RESULT.add(a); :}
+;
+
+LISTA_VALORES2 ::= CORCHETE1 LISTA_VALORES:a CORCHETE2 {: RESULT = a; :}
+;
+//Acceso a Vectores
+ACCESO_VECTOR ::= IDENTIFICADOR:a CORCHETE1 EXPRESION:b CORCHETE2 {: RESULT = new AccesoVector(a, b, aleft, aright); :}
+                | IDENTIFICADOR:a CORCHETE1 EXPRESION:b CORCHETE2 CORCHETE1 EXPRESION:c CORCHETE2 {: RESULT = new AccesoVector(a, b, c, aleft, aright); :}
+                ;
+
+ASIG_VECTOR ::= IDENTIFICADOR:a CORCHETE1 EXPRESION:b CORCHETE2 CORCHETE1 EXPRESION:c CORCHETE2 IGUAL EXPRESION:d PUNTOYCOMA 
+                        {: RESULT = new AsignacionVector(a, b, c, d, aleft, aright); :}
+                | IDENTIFICADOR:a CORCHETE1 EXPRESION:b CORCHETE2 IGUAL EXPRESION:c PUNTOYCOMA         
+                        {: RESULT = new AsignacionVector(a, b, c, aleft, aright); :}
+                ;
+
+//listas dinamicas
+ASIG_LISTA ::= LIST MENOR TIPO:a MAYOR IDENTIFICADOR:b IGUAL NEW LIST PARENTESIS1 PARENTESIS2 PUNTOYCOMA
+                {:RESULT = new DeclaracionLista(b, a, aleft, aright);:}
+                | LIST MENOR TIPO:a MAYOR IDENTIFICADOR:b IGUAL IDENTIFICADOR:c 
+                {:RESULT = new DeclaracionLista(b, c, a, aleft, aright);:};
+
+APPEND_LIST ::= IDENTIFICADOR:a PUNTO APPEND PARENTESIS1 EXPRESION:b PARENTESIS2 PUNTOYCOMA
+                {:RESULT = new Append(a, b, aleft, aright);:};
+
+REMOVE_LIST ::= IDENTIFICADOR:a PUNTO REMOVE PARENTESIS1 EXPRESION:b PARENTESIS2
+                {:RESULT = new Remove(a, b, aleft, aright);:};
+
+//Mwtodos o funciones
+
+
+METODOS_FUNCIONES ::=  TIPO:a IDENTIFICADOR:b PARENTESIS1 PARAMS:p PARENTESIS2 LLAVE1 INSTRUCCIONES:c LLAVE2 {:   RESULT= new Funcion(b, p, c, a, aleft, aright );   :}
+                        |  TIPO:a IDENTIFICADOR:b PARENTESIS1 PARENTESIS2 LLAVE1 INSTRUCCIONES:c LLAVE2  {:   RESULT= new Funcion(b, new LinkedList<HashMap>(), c, a, aleft, aright );   :}
+;
+
+
+PARAMS ::= PARAMS:a COMA TIPO:b IDENTIFICADOR:c   {:  
+                                            RESULT = a;
+                                            var hm2= new HashMap<String, Object>();
+                                            hm2.put("id", c);
+                                            hm2.put("tipo", b);
+                                            RESULT.add(hm2);
+                                        :}
+        | TIPO:a IDENTIFICADOR:b                  {:  RESULT = new LinkedList<HashMap>(); 
+                                            var hm = new HashMap<String, Object>();
+                                            hm.put("id",b);
+                                            hm.put("tipo", a);
+                                            RESULT.add(hm);
+                                        :}
+;
+
+START_FUNCION ::=  START IDENTIFICADOR:a PARENTESIS1 PARAMSCALL:b PARENTESIS2 PUNTOYCOMA     {:   RESULT = new Start(a, b, aleft, aright );   :}
+            | START IDENTIFICADOR:a PARENTESIS1 PARENTESIS2 PUNTOYCOMA                  {:   RESULT = new Start(a, new LinkedList<Instruccion>(), aleft, aright );   :}
+;
+
+
+LLAMADA ::= IDENTIFICADOR:a PARENTESIS1 PARAMSCALL:b PARENTESIS2                {:  RESULT= new Llamada(a, b, aleft, aright);    :}
+          | IDENTIFICADOR:a PARENTESIS1 PARENTESIS2                             {:  RESULT= new Llamada(a, new LinkedList<Instruccion>(), aleft, aright);    :}    
+;
+
+PARAMSCALL ::= PARAMSCALL:a COMA EXPRESION:e    {:  RESULT = a;
+                                                    RESULT.add(e);
+                                                :}
+            | EXPRESION:a                       {:  RESULT = new LinkedList<Instruccion>(); 
+                                                    RESULT.add(a);
+                                                :}
+;
+
+
+RETURN_INS ::= RETURN EXPRESION:a PUNTOYCOMA {: RESULT = new Return(a, aleft, aright); :}
+            | RETURN:a PUNTOYCOMA  {: RESULT = new Return(aleft, aright); :}
+            ;
+
+//Structs
+STRUCTS ::= STRUCT LLAVE1 STRUCTS_LIST:a LLAVE2 IDENTIFICADOR:b PUNTOYCOMA {:RESULT = new Struct(a,b, aleft, aright);:};
+
+STRUCTS_LIST ::= STRUCTS_LIST:a  IDENTIFICADOR:b DOSPUNTOS  TIPO:c PUNTOYCOMA
+                {:RESULT = a; a.put(b, c);:}
+                | STRUCTS_LIST:a  IDENTIFICADOR:b DOSPUNTOS  IDENTIFICADOR:c PUNTOYCOMA
+                {:RESULT = a; a.put(b, c );:}
+                | IDENTIFICADOR:b DOSPUNTOS IDENTIFICADOR:c PUNTOYCOMA
+                {:RESULT = new HashMap<String, Object>(); RESULT.put(b, c);:}
+                | IDENTIFICADOR:b DOSPUNTOS  TIPO:c PUNTOYCOMA
+                {:RESULT = new HashMap<String, Object>(); RESULT.put(b, c);:}
+                ;
+
+
+
+
+INSTANCIACION_STRUCT ::= VARR IDENTIFICADOR:a DOSPUNTOS IDENTIFICADOR:b IGUAL LLAVE1 VALORES_STRUCT:c LLAVE2 PUNTOYCOMA
+                        {:RESULT = new Instanciacion(true, a, b, c, aleft, aright);:}
+                        | CONSTR IDENTIFICADOR:a DOSPUNTOS IDENTIFICADOR:b IGUAL LLAVE1 VALORES_STRUCT:c LLAVE2 PUNTOYCOMA
+                        {:RESULT = new Instanciacion(false, a, b, c, aleft, aright);:};
+
+VALORES_STRUCT ::= VALORES_STRUCT:a COMA IDENTIFICADOR:b DOSPUNTOS EXPRESION:c
+                {:RESULT = a; a.put(b, c);:}
+                |VALORES_STRUCT:a COMA IDENTIFICADOR:b DOSPUNTOS INSTANCIACION_STRUCT:c
+                {:RESULT = a; a.put(b, c);:}
+                | VALORES_STRUCT:a COMA IDENTIFICADOR:b DOSPUNTOS LLAVE1 VALORES_STRUCT:c LLAVE2
+                {:RESULT = a; a.put(b, c);:}
+                | IDENTIFICADOR:b DOSPUNTOS LLAVE1 VALORES_STRUCT:c LLAVE2
+                {:RESULT = new HashMap<String, Object>(); RESULT.put(b,c);:}
+                | IDENTIFICADOR:a DOSPUNTOS INSTANCIACION_STRUCT:b
+                {:RESULT = new HashMap<String, Object>(); RESULT.put(a,b);:}
+                | IDENTIFICADOR:a DOSPUNTOS EXPRESION:b
+                {:RESULT = new HashMap<String, Object>(); RESULT.put(a,b);:}
+                ;
+
+ACCESO_STRUCT ::= IDENTIFICADOR:a PUNTO IDENTIFICADOR:b {:RESULT = new AccesoStruct(a, b, aleft, aright);:}
+                | IDENTIFICADOR:a PUNTO IDENTIFICADOR:b PUNTO IDENTIFICADOR:c {:RESULT = new AccesoStruct(a, b, c, aleft, aright);:}
+                ;
+
+ASIGNACION_STRUCT ::= IDENTIFICADOR:a PUNTO IDENTIFICADOR:b IGUAL EXPRESION:c PUNTOYCOMA {:RESULT = new Asignacion(a, b, c, aleft, aright);:}
+                    | IDENTIFICADOR:a PUNTO IDENTIFICADOR:b PUNTO IDENTIFICADOR:c IGUAL EXPRESION:d PUNTOYCOMA {:RESULT = new Asignacion(a, b, c, d, aleft, aright);:}
+                    ;
+
+
+// Funciones Nativas 
+ROUND_EXP ::= ROUND PARENTESIS1 EXPRESION:a PARENTESIS2 {:RESULT = new Round(a, aleft, aright);:}
+            ;
+
+LENGTH_EXP ::= LENGTH PARENTESIS1 EXPRESION:a PARENTESIS2 {:RESULT = new Length(a, aleft, aright);:};
+
+TOSTRING_EXP ::= TOSTRING PARENTESIS1 EXPRESION:a PARENTESIS2 {:RESULT = new ToString(a, aleft, aright);:};
+
+FIND_EXP ::= IDENTIFICADOR:a PUNTO FIND PARENTESIS1 EXPRESION:b  PARENTESIS2 {:RESULT = new Find(a, b, aleft, aright);:};

@@ -1,0 +1,114 @@
+package Analizadores;
+
+//importaciones importantes 
+import java_cup.runtime.Symbol;
+import java.util.LinkedList;
+import abstracto.Instruccion;
+import simbolo.tipoDato;
+import simbolo.Tipo;
+
+
+//Instrucciones
+import instrucciones.Print;
+
+
+//Expresiones
+import expresiones.Nativo;
+import expresiones.Aritmetica;
+//import expresiones.Logicas;
+import expresiones.Relacionales;
+import expresiones.OperadoresRelacionales;
+//import expresiones.OperadoresLogicos;
+import expresiones.operadoresAritmeticos;
+
+parser code
+{:
+    scanner s;
+    parser(scanner s){
+        this.s = s;
+    }
+
+    public void syntax_error(Symbol cur_token){
+        System.out.println("Error de sintaxis en la linea: " +
+        (cur_token.left) + " columna: " + (cur_token.right)+
+        "No se esperaba: " + cur_token.value);
+    }
+
+    public void report_error(Symbol cur_token){
+       System.out.println("Error Sintactico no recuperable en la linea" +
+        (s.left) + " y columna " + (s.right) +
+        ". No se esperaba el componente: " + (cur_token.value) + ".");
+    }
+:}
+
+action code
+{:
+    
+:}
+
+
+//Terminales
+terminal String MENOS, MAS, ASTERISCO, DIV, PORCENTAJE, IGUAL, MAYORQUE, MENORQUE
+         XOR, GUIONBAJO, PARENTESISIZQ, PARENTESISDER, LLAVEIZQ, LLAVEDER, PUNTOYCOMA,
+         DOSPUNTOS, COMA, CORCHETEIZQ, CORCHETEDER, NOT, ANDS, ORS, DOUBLET
+         INTT, STRINGT, BOOLT, CHART, TRUEr, FALSEr, VARR, CONSTR, IFR, ELSER, MATCH, WHILER, 
+         FORR, DOR, BREAKR, CONTINUER, PRINT, IDENTIFICADOR, DOUBLER, ENTERO, CADENA,
+         COMENTARIO, COMENTARIO_MULTILINEA, CARACTER, UMENOS, EQUAL, DIF, MAYORIGUAL, MENORIGUAL, NOP
+         MEN, MAY, AND, OR, XORS;
+
+//No terminales
+nonterminal LinkedList<Instruccion> inicio, instrucciones;
+nonterminal Instruccion instruccion;
+nonterminal Instruccion imprecion;
+nonterminal Instruccion expresion;
+
+//Precedencia
+precedence left OR;
+precedence left AND;
+precedence left IGUAL ,DIF,MEN,MENORIGUAL,MAY,MAYORIGUAL;
+precedence left XORS;
+precedence left MAS, MENOS;
+precedence left ASTERISCO, DIV, PORCENTAJE;
+precedence right NOP UMENOS;
+
+start with inicio;
+
+inicio ::= instrucciones 
+;
+instrucciones ::= instrucciones instruccion
+                | instruccion
+;
+
+instruccion ::= imprecion
+;
+
+imprecion ::= PRINT  PARENTESISIZQ expresion PARENTESISDER PUNTOYCOMA
+;
+
+expresion ::= MENOS expresion: {:  RESULT = new Aritmeticas(a,b operadoresAritmeticos.NEGACION,  aleft, aright);:} %prec UMENOS 
+            | expresion:a MAS expresion:b {:  RESULT = new Aritmeticas(a,b operadoresAritmeticos.SUMA,  aleft, aright); :}
+            | expresion:a MENOS expresion:b {:  RESULT = new Aritmeticas(a,b operadoresAritmeticos.RESTA,  aleft, aright); :}
+            | expresion:a ASTERISCO expresion:b {:  RESULT = new Aritmeticas(a,b operadoresAritmeticos.MULTIPLICACION,  aleft, aright); :}
+            | expresion:a DIV expresion:b {: RESULT = new Aritmeticas(a,b operadoresAritmeticos.DIVISION,  aleft, aright); :}
+            | expresion:a PORCENTAJE expresion:b {: RESULT = new Aritmeticas(a,b operadoresAritmeticos.MODULO,  aleft, aright); :}
+            | expresion:a IGUAL IGUAL expresion:b {:   RESULT = new Relacionales(a, b, OperadoresRelacionales.IGUALACION, aleft, aright); :}%prec EQUAL
+            | expresion:a NOT IGUAL expresion:b {: RESULT = new Relacionales(a, b, OperadoresRelacionales.DIFERENCIACION, aleft, aright); :}%prec DIF
+            | expresion:a MENORQUE expresion:b {:  RESULT = new Relacionales(a, b, OperadoresRelacionales.MENORQUE, aleft, aright); :}%prec MEN
+            | expresion:a MAYORQUE expresion:b {:  RESULT = new Relacionales(a, b, OperadoresRelacionales.MAYORQUE, aleft, aright); :}%prec MAY
+            | expresion MENORQUE IGUAL expresion {:  RESULT = new Relacionales(a, b, OperadoresRelacionales.MENORIGUAL, aleft, aright); :}%prec MENORIGUAL
+            | expresion MAYORQUE IGUAL expresion {: RESULT = new Relacionales(a, b, OperadoresRelacionales.MAYORIGUAL, aleft, aright); :}%prec MAYORIGUAL
+            | NOT expresion:a {: RESULT = Logicas(a, OperadoresLogicos.NOT, aleft, aright); :}%prec NOP
+            | expresion:a ANDS ANDS expresion:b {: RESULT = Logicas(a, b, OperadoresLogicos.AND, aleft, aright); :}%prec AND
+            | expresion:a ORS ORS expresion:b {:  RESULT = Logicas(a, b, OperadoresLogicos.OR, aleft, aright) :}%prec OR
+            | expresion:a XORS expresion:b {: RESULT = new Logicas( a, b, OperadoresLogicos.XOR, aleft, aright ):}%prec XORS
+            | IDENTIFICADOR 
+            | DOUBLE {: RESULT = new Nativo(new Double(a), Tipo(tipoDato.CADENA), aleft, aright); :}
+            | ENTERO:a  {: RESULT = new Nativo(Integer.parseInt(a), new Tipo(tipoDato.ENTERO), aleft, aright); :}
+            | CARACTER:a  {: RESULT = new Nativo(a.charAt(0), new Tipo(tipoDato.CARACTER), aleft, aright); :}
+            | CADENA:a  {: RESULT = new Nativo(a, Tipo(tipoDato.CADENA), aleft, aright); :}
+            | TRUE {: RESULT = new Nativo(true, new Tipo(tipoDato.BOOL), aleft, aright); :}
+            | FALSE {: RESULT = new Nativo(false, new Tipo(tipoDato.BOOL), aleft, aright);:}
+            | PARENTESISIZQ expresion PARENTESISDER {::}
+;           
+
+
